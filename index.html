@@ -1,85 +1,204 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Gemma AI | Ideas de Cristian</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #111; padding: 35px; border-radius: 20px; width: 380px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        h1 { color: #4285F4; margin-bottom: 5px; }
-        input { width: 100%; padding: 14px; margin: 20px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: #4285F4; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #resultado { margin-top: 25px; text-align: left; }
-        .idea { background: #1a1a1a; padding: 15px; margin-bottom: 12px; border-radius: 10px; border-left: 4px solid #4285F4; font-size: 14px; line-height: 1.5; }
-    </style>
+<meta charset="UTF-8">
+<title>Ideas Virales IA</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.card{
+background:#111827;
+padding:40px;
+border-radius:20px;
+width:430px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:14px;
+border-radius:10px;
+border:none;
+margin-top:20px;
+margin-bottom:15px;
+font-size:16px;
+}
+
+button{
+padding:14px;
+border:none;
+background:#f97316;
+color:white;
+font-weight:bold;
+border-radius:10px;
+cursor:pointer;
+width:100%;
+}
+
+.idea{
+background:#1f2937;
+padding:12px;
+margin-top:10px;
+border-radius:8px;
+text-align:left;
+}
+
+</style>
 </head>
+
 <body>
-    <div class="card">
-        <h1>Gemma AI</h1>
-        <p style="color: #888;">Generador de Ideas Magistrales</p>
-        <input id="tema" placeholder="¿Qué quieres crear hoy?">
-        <button id="btn" onclick="generar()">GENERAR AHORA</button>
-        <div id="resultado"></div>
-    </div>
+
+<div class="card">
+
+<h1>Generador de Ideas Virales</h1>
+
+<input id="tema" placeholder="Ejemplo: comida, fútbol, viajes">
+
+<button onclick="generarIdeas()">Generar Ideas</button>
+
+<div id="resultado"></div>
+
+</div>
 
 <script>
-    // Tu token dividido para mayor seguridad
-    const a = "hf_scSZJ"; 
-    const b = "tvIXbfcwJPYRPMkp";
-    const c = "CXCDsLYWVvYQU";
-    const LLAVE = (a + b + c).trim();
 
-    async function generar() {
-        const t = document.getElementById("tema").value;
-        const bnt = document.getElementById("btn");
-        const res = document.getElementById("resultado");
+// estructuras virales reales
+const estructuras=[
 
-        if(!t) return alert("Escribe un tema");
+"Probé los {tema} más raros que encontré en internet",
+"Las 7 curiosidades más locas sobre {tema}",
+"Intenté aprender todo sobre {tema} en 24 horas",
+"Los mayores errores que la gente comete con {tema}",
+"5 secretos de {tema} que casi nadie conoce",
+"Probé el {tema} más caro vs el más barato",
+"Así cambió mi vida después de probar {tema}",
+"Los {tema} más extraños que existen",
+"Lo que nadie te dice sobre {tema}",
+"Intenté sobrevivir un día usando solo {tema}",
+"Probando los mejores {tema} del mundo",
+"Las tendencias más raras de {tema}",
+"Intenté recrear los {tema} virales de TikTok",
+"Los datos más sorprendentes sobre {tema}",
+"Los {tema} más populares del momento",
+"Probé los hacks de {tema} que encontré en internet",
+"Lo peor y lo mejor de {tema}",
+"Las mayores mentiras sobre {tema}",
+"El lado oscuro de {tema}",
+"Lo que pasaría si desapareciera el {tema}",
+"Intenté vivir solo con {tema} durante un día",
+"Las teorías más locas sobre {tema}",
+"El ranking de los mejores {tema}",
+"Las cosas más raras que encontré sobre {tema}",
+"Los {tema} más famosos de internet"
 
-        bnt.disabled = true;
-        bnt.innerText = "Pensando...";
-        res.innerHTML = "Conectando con el cerebro de Google...";
+];
 
-        try {
-            const peticion = await fetch("https://api-inference.huggingface.co/models/google/gemma-1.1-7b-it", {
-                method: "POST",
-                headers: { 
-                    "Authorization": `Bearer ${LLAVE}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ 
-                    inputs: `Dame 3 ideas cortas y creativas para videos de: ${t}`,
-                    parameters: { wait_for_model: true }
-                })
-            });
+// palabras absurdas que bloquearemos
+const prohibidas=["ropa","aire","respirar","caminar","parpadear"];
 
-            const data = await peticion.json();
+// filtrar ideas tontas
+function esIdeaValida(texto){
 
-            if(peticion.status !== 200) {
-                res.innerHTML = `<p style="color:#ff4444">Error ${peticion.status}: La IA está despertando, intenta en 10 segundos.</p>`;
-                return;
-            }
+for(let palabra of prohibidas){
 
-            res.innerHTML = "";
-            const texto = data[0].generated_text;
-            // Solo mostramos las ideas nuevas, quitando la pregunta inicial
-            const ideas = texto.replace(`Dame 3 ideas cortas y creativas para videos de: ${t}`, "").trim();
-            
-            ideas.split("\n").filter(i => i.trim().length > 5).forEach(idea => {
-                let d = document.createElement("div");
-                d.className = "idea";
-                d.innerText = idea.trim();
-                res.appendChild(d);
-            });
+if(texto.toLowerCase().includes(palabra)){
+return false;
+}
 
-        } catch (e) {
-            res.innerHTML = "<p style='color:#ff4444'>Error de conexión. Revisa tu internet.</p>";
-        } finally {
-            bnt.disabled = false;
-            bnt.innerText = "GENERAR AHORA";
-        }
-    }
+}
+
+return true;
+
+}
+
+async function generarIdeas(){
+
+const tema=document.getElementById("tema").value.trim();
+const res=document.getElementById("resultado");
+
+if(!tema){
+alert("Escribe un tema");
+return;
+}
+
+res.innerHTML="Generando ideas...";
+
+let ideas=[];
+
+// generar muchas ideas con estructuras
+for(let i=0;i<40;i++){
+
+let plantilla=estructuras[Math.floor(Math.random()*estructuras.length)];
+let idea=plantilla.replace("{tema}",tema);
+
+if(esIdeaValida(idea)){
+ideas.push(idea);
+}
+
+}
+
+// intentar usar IA gratis
+try{
+
+const peticion=await fetch(
+"https://api-inference.huggingface.co/models/google/flan-t5-large",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+inputs:`Genera 5 ideas virales de contenido sobre ${tema}`
+})
+});
+
+const data=await peticion.json();
+
+if(data && data[0]){
+
+let texto=data[0].generated_text.split("\n");
+
+texto.forEach(i=>{
+if(i.length>10 && esIdeaValida(i)){
+ideas.push(i);
+}
+});
+
+}
+
+}catch(e){
+
+console.log("IA ocupada");
+
+}
+
+res.innerHTML="";
+
+// mostrar ideas
+ideas.slice(0,30).forEach(i=>{
+
+let d=document.createElement("div");
+d.className="idea";
+d.innerText=i;
+
+res.appendChild(d);
+
+});
+
+}
+
 </script>
+
 </body>
 </html>
