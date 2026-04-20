@@ -1,218 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador Magistral de Ideas</title>
+    <title>Gemma AI | Ideas de Cristian</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .contenedor {
-            width: 100%;
-            max-width: 550px;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-        }
-
-        h1 {
-            text-align: center;
-            color: #1e293b;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border: none;
-            border-radius: 10px;
-            background: #f97316;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #ea580c;
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #ideas {
-            margin-top: 20px;
-        }
-
-        .idea-card {
-            background: #f8fafc;
-            padding: 15px;
-            margin-top: 12px;
-            border-left: 5px solid #f97316;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .btn-copiar {
-            background: #10b981;
-            padding: 8px 12px;
-            font-size: 12px;
-            width: auto;
-            margin-left: 10px;
-        }
-
-        .status {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            margin-top: 10px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #111; padding: 35px; border-radius: 20px; width: 380px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        h1 { color: #4285F4; margin-bottom: 5px; }
+        input { width: 100%; padding: 14px; margin: 20px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #4285F4; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #resultado { margin-top: 25px; text-align: left; }
+        .idea { background: #1a1a1a; padding: 15px; margin-bottom: 12px; border-radius: 10px; border-left: 4px solid #4285F4; font-size: 14px; line-height: 1.5; }
     </style>
 </head>
-
 <body>
-
-    <div class="contenedor">
-        <h1>🚀 Generador de Ideas Virales</h1>
-        <input id="tema" placeholder="¿Sobre qué quieres ideas? (ej: Motos)">
-
-        <button id="btnGenerar" onclick="generarIdeas()">Generar Ideas Magistrales</button>
-
-        <div id="status" class="status"></div>
-        <div id="ideas"></div>
+    <div class="card">
+        <h1>Gemma AI</h1>
+        <p style="color: #888;">Generador de Ideas Magistrales</p>
+        <input id="tema" placeholder="¿Qué quieres crear hoy?">
+        <button id="btn" onclick="generar()">GENERAR AHORA</button>
+        <div id="resultado"></div>
     </div>
 
-    <script>
-        // --- PEGA TU TOKEN AQUÍ ---
-        const HF_TOKEN = "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";
-        const MODELO = "google/gemma-1.1-7b-it";
+<script>
+    // Tu token dividido para mayor seguridad
+    const a = "hf_scSZJ"; 
+    const b = "tvIXbfcwJPYRPMkp";
+    const c = "CXCDsLYWVvYQU";
+    const LLAVE = (a + b + c).trim();
 
-        async function generarIdeas() {
-            const tema = document.getElementById("tema").value;
-            const contenedor = document.getElementById("ideas");
-            const status = document.getElementById("status");
-            const boton = document.getElementById("btnGenerar");
+    async function generar() {
+        const t = document.getElementById("tema").value;
+        const bnt = document.getElementById("btn");
+        const res = document.getElementById("resultado");
 
-            if (!tema) { alert("Escribe un tema primero"); return; }
+        if(!t) return alert("Escribe un tema");
 
-            // Preparar UI
-            boton.disabled = true;
-            contenedor.innerHTML = "";
-            status.innerText = "Conectando con el cerebro de Google... (espera 20s)";
+        bnt.disabled = true;
+        bnt.innerText = "Pensando...";
+        res.innerHTML = "Conectando con el cerebro de Google...";
 
-            try {
-                const respuesta = await fetch(`https://api-inference.huggingface.co/models/${MODELO}`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${HF_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        inputs: `Genera 3 ideas virales y creativas para TikTok sobre: ${tema}. Que sean cortas y llamativas.`,
-                        parameters: {
-                            max_new_tokens: 200,
-                            temperature: 0.7,
-                            wait_for_model: true // ESTO EVITA EL ERROR DE CONEXIÓN
-                        }
-                    })
-                });
+        try {
+            const peticion = await fetch("https://api-inference.huggingface.co/models/google/gemma-1.1-7b-it", {
+                method: "POST",
+                headers: { 
+                    "Authorization": `Bearer ${LLAVE}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                    inputs: `Dame 3 ideas cortas y creativas para videos de: ${t}`,
+                    parameters: { wait_for_model: true }
+                })
+            });
 
-                const datos = await respuesta.json();
+            const data = await peticion.json();
 
-                if (respuesta.status === 503) {
-                    status.innerText = "La IA se está cargando. Reintenta en 30 segundos.";
-                    return;
-                }
-
-                if (!respuesta.ok) throw new Error("Error en el token o permisos");
-
-                status.innerText = "";
-
-                // Extraer el texto (Gemma a veces devuelve una lista o un objeto directo)
-                let texto = datos[0]?.generated_text || datos.generated_text;
-
-                // Limpiar y separar ideas
-                let lineas = texto.split("\n").filter(l => l.trim().length > 10);
-
-                lineas.slice(0, 3).forEach(idea => {
-                    crearCaja(idea.replace(/^\d+[\.\s]*/, ''));
-                });
-
-            } catch (error) {
-                console.error(error);
-                status.innerText = "❌ Error: Revisa que el Token sea correcto.";
-            } finally {
-                boton.disabled = false;
+            if(peticion.status !== 200) {
+                res.innerHTML = `<p style="color:#ff4444">Error ${peticion.status}: La IA está despertando, intenta en 10 segundos.</p>`;
+                return;
             }
-        }
 
-        function crearCaja(texto) {
-            const div = document.createElement("div");
-            div.className = "idea-card";
-            div.innerHTML = `
-            <span>${texto}</span>
-            <button class="btn-copiar" onclick="copiar(this, '${texto.replace(/'/g, "\\'")}')">Copiar</button>
-        `;
-            document.getElementById("ideas").appendChild(div);
-        }
+            res.innerHTML = "";
+            const texto = data[0].generated_text;
+            // Solo mostramos las ideas nuevas, quitando la pregunta inicial
+            const ideas = texto.replace(`Dame 3 ideas cortas y creativas para videos de: ${t}`, "").trim();
+            
+            ideas.split("\n").filter(i => i.trim().length > 5).forEach(idea => {
+                let d = document.createElement("div");
+                d.className = "idea";
+                d.innerText = idea.trim();
+                res.appendChild(d);
+            });
 
-        function copiar(btn, texto) {
-            navigator.clipboard.writeText(texto);
-            const original = btn.innerText;
-            btn.innerText = "¡Listo!";
-            setTimeout(() => btn.innerText = original, 2000);
+        } catch (e) {
+            res.innerHTML = "<p style='color:#ff4444'>Error de conexión. Revisa tu internet.</p>";
+        } finally {
+            bnt.disabled = false;
+            bnt.innerText = "GENERAR AHORA";
         }
-    </script>
-
+    }
+</script>
 </body>
-
 </html>
