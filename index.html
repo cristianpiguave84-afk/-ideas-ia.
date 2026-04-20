@@ -2,56 +2,62 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Ideas Virales IA</title>
+<title>Ideas de Cristian</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#0f172a;
-color:white;
+font-family:'Segoe UI',sans-serif;
+background:#000;
+color:#fff;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+min-height:100vh;
 margin:0;
 }
 
 .card{
-background:#111827;
-padding:40px;
+background:#111;
+padding:35px;
 border-radius:20px;
-width:430px;
+width:380px;
+border:1px solid #333;
 text-align:center;
+}
+
+h1{
+color:#4285F4;
 }
 
 input{
 width:100%;
 padding:14px;
+margin:20px 0;
 border-radius:10px;
-border:none;
-margin-top:20px;
-margin-bottom:15px;
-font-size:16px;
+border:1px solid #444;
+background:#222;
+color:#fff;
 }
 
 button{
+width:100%;
 padding:14px;
+background:#4285F4;
+color:#fff;
 border:none;
-background:#f97316;
-color:white;
-font-weight:bold;
 border-radius:10px;
 cursor:pointer;
-width:100%;
+font-weight:bold;
 }
 
 .idea{
-background:#1f2937;
-padding:12px;
-margin-top:10px;
-border-radius:8px;
-text-align:left;
+background:#1a1a1a;
+padding:15px;
+margin-bottom:10px;
+border-radius:10px;
+border-left:4px solid #4285F4;
+font-size:14px;
 }
 
 </style>
@@ -61,11 +67,11 @@ text-align:left;
 
 <div class="card">
 
-<h1>Generador de Ideas Virales</h1>
+<h1>Ideas Virales</h1>
 
-<input id="tema" placeholder="Ejemplo: comida, fútbol, viajes">
+<input id="tema" placeholder="Ejemplo: comida">
 
-<button onclick="generarIdeas()">Generar Ideas</button>
+<button onclick="generar()">Generar</button>
 
 <div id="resultado"></div>
 
@@ -73,46 +79,32 @@ text-align:left;
 
 <script>
 
-// estructuras virales reales
+// estructuras buenas
 const estructuras=[
 
-"Probé los {tema} más raros que encontré en internet",
-"Las 7 curiosidades más locas sobre {tema}",
-"Intenté aprender todo sobre {tema} en 24 horas",
-"Los mayores errores que la gente comete con {tema}",
-"5 secretos de {tema} que casi nadie conoce",
-"Probé el {tema} más caro vs el más barato",
-"Así cambió mi vida después de probar {tema}",
-"Los {tema} más extraños que existen",
-"Lo que nadie te dice sobre {tema}",
-"Intenté sobrevivir un día usando solo {tema}",
-"Probando los mejores {tema} del mundo",
-"Las tendencias más raras de {tema}",
-"Intenté recrear los {tema} virales de TikTok",
-"Los datos más sorprendentes sobre {tema}",
-"Los {tema} más populares del momento",
-"Probé los hacks de {tema} que encontré en internet",
-"Lo peor y lo mejor de {tema}",
-"Las mayores mentiras sobre {tema}",
+"5 cosas que no sabías sobre {tema}",
+"Los errores más comunes en {tema}",
+"Probé los {tema} más raros del mundo",
+"Los mejores trucos de {tema}",
 "El lado oscuro de {tema}",
-"Lo que pasaría si desapareciera el {tema}",
-"Intenté vivir solo con {tema} durante un día",
-"Las teorías más locas sobre {tema}",
-"El ranking de los mejores {tema}",
-"Las cosas más raras que encontré sobre {tema}",
-"Los {tema} más famosos de internet"
+"Intenté aprender {tema} en un día",
+"Los secretos de {tema}",
+"Probé el {tema} más caro vs barato",
+"Las curiosidades más raras de {tema}",
+"Lo que nadie te dice de {tema}",
+"Las tendencias de {tema} que están explotando",
+"Los mejores {tema} de internet"
 
 ];
 
-// palabras absurdas que bloquearemos
-const prohibidas=["ropa","aire","respirar","caminar","parpadear"];
+// palabras absurdas
+const absurdas=["ropa","aire","respirar"];
 
-// filtrar ideas tontas
-function esIdeaValida(texto){
+function esValida(texto){
 
-for(let palabra of prohibidas){
+for(let p of absurdas){
 
-if(texto.toLowerCase().includes(palabra)){
+if(texto.toLowerCase().includes(p)){
 return false;
 }
 
@@ -122,13 +114,13 @@ return true;
 
 }
 
-async function generarIdeas(){
+async function generar(){
 
 const tema=document.getElementById("tema").value.trim();
 const res=document.getElementById("resultado");
 
 if(!tema){
-alert("Escribe un tema");
+alert("Escribe algo");
 return;
 }
 
@@ -136,19 +128,20 @@ res.innerHTML="Generando ideas...";
 
 let ideas=[];
 
-// generar muchas ideas con estructuras
-for(let i=0;i<40;i++){
+// generar muchas con plantillas
+for(let i=0;i<20;i++){
 
 let plantilla=estructuras[Math.floor(Math.random()*estructuras.length)];
+
 let idea=plantilla.replace("{tema}",tema);
 
-if(esIdeaValida(idea)){
+if(esValida(idea)){
 ideas.push(idea);
 }
 
 }
 
-// intentar usar IA gratis
+// intentar usar IA
 try{
 
 const peticion=await fetch(
@@ -159,37 +152,44 @@ headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-inputs:`Genera 5 ideas virales de contenido sobre ${tema}`
+inputs:`Dame 5 ideas de videos sobre ${tema}`
 })
 });
 
+if(peticion.ok){
+
 const data=await peticion.json();
 
-if(data && data[0]){
+if(data[0]){
 
 let texto=data[0].generated_text.split("\n");
 
 texto.forEach(i=>{
-if(i.length>10 && esIdeaValida(i)){
+
+if(i.length>8 && esValida(i)){
 ideas.push(i);
 }
+
 });
+
+}
 
 }
 
 }catch(e){
 
-console.log("IA ocupada");
+console.log("IA no disponible");
 
 }
 
 res.innerHTML="";
 
-// mostrar ideas
-ideas.slice(0,30).forEach(i=>{
+ideas.slice(0,25).forEach(i=>{
 
 let d=document.createElement("div");
+
 d.className="idea";
+
 d.innerText=i;
 
 res.appendChild(d);
